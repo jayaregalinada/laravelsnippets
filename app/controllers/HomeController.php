@@ -1,10 +1,10 @@
 <?php
-
 use LaraSnipp\Repo\Snippet\SnippetRepositoryInterface;
 use LaraSnipp\Repo\User\UserRepositoryInterface;
+use LaraSnipp\Repo\Tag\TagRepositoryInterface;
 
-class HomeController extends BaseController {
-
+class HomeController extends BaseController
+{
     /**
      * Snippet repository
      *
@@ -19,10 +19,21 @@ class HomeController extends BaseController {
      */
     protected $user;
 
-    public function __construct(SnippetRepositoryInterface $snippet, UserRepositoryInterface $user)
+    /**
+     * Tag repository
+     *
+     * @var \LaraSnipp\Repo\Snippet\TagRepositoryInterface
+     */
+    protected $tag;
+
+    public function __construct(
+        SnippetRepositoryInterface $snippet,
+        UserRepositoryInterface $user,
+        TagRepositoryInterface $tag)
     {
-		$this->snippet = $snippet;
+        $this->snippet = $snippet;
         $this->user = $user;
+        $this->tag = $tag;
     }
 
     /**
@@ -34,13 +45,15 @@ class HomeController extends BaseController {
         $page = Input::get('page', 1);
 
         // Candidate for config item
-        $perPage = 5;
+        $perPage = 10;
 
         $pagiData = $this->snippet->byPage($page, $perPage);
-        $data['snippets'] = Paginator::make($pagiData->items, $pagiData->totalItems, $perPage);
-        $data['topSnippetContributors'] = $this->user->getTopSnippetContributors();
-        $data['mostViewedSnippets'] = $this->snippet->getMostViewed();
-        return View::make('home.index', $data);
+        $snippets = Paginator::make($pagiData->items, $pagiData->totalItems, $perPage);
+        $topSnippetContributors = $this->user->getTopSnippetContributors();
+        $mostViewedSnippets = $this->snippet->getMostViewed(10);
+        $tags = $this->tag->all();
+
+        return View::make('home.index', compact('snippets', 'topSnippetContributors', 'mostViewedSnippets', 'tags'));
     }
 
 }

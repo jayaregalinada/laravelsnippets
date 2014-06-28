@@ -24,10 +24,11 @@
 
           <div class="form-group">
             {{ Form::textarea('description', $value = '', array('placeholder' => 'Description (optional)', 'class'=> 'form-control')) }}
+            <p class="help-block"><a href="https://help.github.com/articles/github-flavored-markdown">GitHub-flavoured Markdown</a> is supported.</p>
           </div>
 
           <div class="form-group">
-            {{ Form::textarea('body', $value = 'public static function() { echo "Hello World!"; }', array('placeholder' => 'Snippet', 'id' => 'code', 'class'=> 'form-control', 'required' => 'required')) }}
+            {{ Form::textarea('body', $value = 'public static function () { echo "Hello World!"; }', array('placeholder' => 'Snippet', 'id' => 'code', 'class'=> 'form-control', 'required' => 'required')) }}
           </div>
 
           <div class="form-group">
@@ -39,8 +40,8 @@
           </div>
 
           <div class="form-group">
-            <label>Tags:</label>
-            {{ Form::select('tags[]', $tags, 'S', array('multiple' => 'multiple', 'data-placeholder' => 'Choose tags', 'style' => 'width: 30%;')) }}
+            <label>Categories:</label>
+            {{ Form::select('tags[]', $tags, 'S', array('multiple' => 'multiple', 'data-placeholder' => 'Choose categories', 'style' => 'width: 30%;')) }}
           </div>
 
           <div class="form-group">
@@ -53,4 +54,3 @@
   </div>
 
 @stop
-

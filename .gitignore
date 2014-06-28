@@ -19,3 +19,9 @@ Thumbs.db
 
 # test site basic auth
 public/.htpasswd
+
+# vagrant
+.vagrant
+/node_modules/
+
+/.idea/

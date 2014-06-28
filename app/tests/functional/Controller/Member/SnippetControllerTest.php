@@ -1,13 +1,13 @@
 <?php namespace Tests\Functional\Controller\Member;
 
 use TestCase;
+use Config;
 use User;
 use Snippet;
-use Hash;
 use Way\Tests\Factory;
 
-class SnippetControllerTest extends TestCase {
-
+class SnippetControllerTest extends TestCase
+{
     public function testGetShowRendersNotYetApprovedSnippets()
     {
         $user = Factory::create('User');
@@ -86,7 +86,7 @@ class SnippetControllerTest extends TestCase {
             'tags' => array('12345') // <-- invalid tag id since no tags are on the db yet
         );
 
-        $response = $this->call('POST', route('member.snippet.postStore', $inputs));
+        $response = $this->call('POST', route('member.snippet.postStore'), $inputs);
     }
 
     public function testPostStoreSavesSnippetOnValidInput()
@@ -100,11 +100,11 @@ class SnippetControllerTest extends TestCase {
         $input = array(
             'title' => 'dummy title',
             'body' => 'dummy body',
-            'resource' => 'http://laravelsnippets.com/',
+            'resource' => Config::get('site.url'),
             'tags' => array($tag->id, $secondTag->id)
         );
 
-        $response = $this->call('POST', route('member.snippet.postStore', $input));
+        $response = $this->call('POST', route('member.snippet.postStore'), $input);
         $this->assertRedirectedToRoute('member.snippet.getCreate');
         $this->assertSessionHas('message', "Your snippet is now submitted and waiting for admin's approval");
     }
@@ -112,6 +112,8 @@ class SnippetControllerTest extends TestCase {
     public function testGetEdit()
     {
         $user = Factory::create('User');
+        $user->id = (string) $user->id;
+
         $this->be($user);
 
         $snippet = Factory::create('Snippet', array(
@@ -129,6 +131,8 @@ class SnippetControllerTest extends TestCase {
     public function testPostUpdateUpdatesSnippetOnValidInput()
     {
         $user = Factory::create('User');
+        $user->id = (string) $user->id;
+
         $this->be($user);
 
         $tag = Factory::create('Tag');
@@ -141,7 +145,7 @@ class SnippetControllerTest extends TestCase {
         $input = array(
             'title' => 'dummy title',
             'body' => 'dummy body',
-            'resource' => 'http://laravelsnippets.com/',
+            'resource' => Config::get('site.url'),
             'tags' => array($tag->id, $secondTag->id)
         );
 

@@ -11,8 +11,8 @@ use LaraSnipp\Repo\User\UserRepositoryInterface;
 use LaraSnipp\Repo\Tag\TagRepositoryInterface;
 use LaraSnipp\Service\Form\Snippet\SnippetForm;
 
-class SnippetController extends BaseController {
-
+class SnippetController extends BaseController
+{
     /**
      * Snippet repository
      *
@@ -63,12 +63,17 @@ class SnippetController extends BaseController {
     {
         $snippet = $this->snippet->bySlug($slug, $all = true);
 
-        if ( ! $snippet)
-        {
+        if (! $snippet) {
             return App::abort(404);
         }
 
-        return View::make('snippets.show', compact('snippet'));
+        $user = Auth::user();
+        $has_starred = ! empty( $user ) ? $user->hasStarred( $snippet->id ) : false;
+
+        $tags = $this->tag->all();
+        $topSnippetContributors = $this->user->getTopSnippetContributors();
+
+        return View::make('snippets.show', compact('snippet', 'has_starred', 'tags', 'topSnippetContributors'));
     }
 
     /**
@@ -78,6 +83,7 @@ class SnippetController extends BaseController {
     public function getCreate()
     {
         $tags = $this->tag->all()->lists('name', 'id');
+
         return View::make('member.snippets.create', compact('tags'));
     }
 
@@ -87,8 +93,7 @@ class SnippetController extends BaseController {
      */
     public function postStore()
     {
-        if($this->snippetForm->create(Input::all()))
-        {
+        if ($this->snippetForm->create(Input::all())) {
             return Redirect::route('member.snippet.getCreate')
                 ->with('message', "Your snippet is now submitted and waiting for admin's approval")
                 ->with('messageType', "success");
@@ -111,6 +116,7 @@ class SnippetController extends BaseController {
         if ( ! $snippet->isTheAuthor(Auth::user())) return App::abort(404);
 
         $tags = $this->tag->all()->lists('name', 'id');
+
         return View::make('member.snippets.edit', compact('snippet', 'tags'));
     }
 
@@ -120,8 +126,7 @@ class SnippetController extends BaseController {
      */
     public function postUpdate($slug)
     {
-        if($snippet = $this->snippetForm->update($slug, Input::all()))
-        {
+        if ($snippet = $this->snippetForm->update($slug, Input::all())) {
             return Redirect::route('member.snippet.getShow', $snippet->slug)
                 ->with('message', 'Update successful')
                 ->with('messageType', 'success');
@@ -131,6 +136,5 @@ class SnippetController extends BaseController {
                 ->withInput()
                 ->withErrors($this->snippetForm->errors());
     }
-
 
 }

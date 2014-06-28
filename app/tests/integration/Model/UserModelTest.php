@@ -4,8 +4,8 @@ use TestCase;
 use User;
 use Hash;
 
-class UserModelTest extends TestCase {
-
+class UserModelTest extends TestCase
+{
     public function testGetFullNameAttribute()
     {
         $user = new User;
@@ -27,7 +27,9 @@ class UserModelTest extends TestCase {
     {
         $user = new User;
 
-        $this->assertEquals(asset('/assets/images/default-user-avatar.jpeg'), $user->abs_photo_url);
+        $user->email = 'johndoe@gmail.com';
+
+        $this->assertNotEquals(asset('photo.png'), $user->abs_photo_url);
 
         $user->photo_url = 'photo.png';
 

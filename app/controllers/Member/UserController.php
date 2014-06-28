@@ -3,16 +3,12 @@
 use BaseController;
 use View;
 use Input;
-use Redirect;
 use Paginator;
 use Auth;
 use LaraSnipp\Repo\Snippet\SnippetRepositoryInterface;
-use LaraSnipp\Repo\User\UserRepositoryInterface;
-use LaraSnipp\Repo\Tag\TagRepositoryInterface;
-use LaraSnipp\Service\Form\Snippet\SnippetForm;
 
-class UserController extends BaseController {
-
+class UserController extends BaseController
+{
     /**
      * Snippet repository
      *
@@ -26,10 +22,10 @@ class UserController extends BaseController {
     }
 
     /**
-     * Show snippet listing of the current logged-in user
-     * GET /members/my-snippets
+     * Show dashboard with snippets and starred snippets of the current logged-in user
+     * GET /members/dashboard
      */
-    public function getMySnippets()
+    public function dashboard()
     {
         $page = Input::get('page', 1);
 
@@ -37,8 +33,12 @@ class UserController extends BaseController {
         $perPage = 10;
 
         $pagiData = $this->snippet->byAuthor(Auth::user()->slug, $page, $perPage, $all = true);
-        $snippets = Paginator::make($pagiData->items, $pagiData->totalItems, $perPage);
-        return View::make('member.users.snippets', compact('snippets'));
+        $my_snippets = Paginator::make($pagiData->items, $pagiData->totalItems, $perPage);
+
+        $user = Auth::user();
+        $starred_snippets = $user->starred()->with('Snippet')->get();
+
+        return View::make('member.users.dashboard', compact('my_snippets', 'starred_snippets'));
     }
 
 }

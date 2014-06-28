@@ -34,9 +34,19 @@ Route::get('snippets', array('uses' => 'SnippetController@getIndex',
     'as' => 'snippet.getIndex'));
 Route::get('snippets/{slug}', array('uses' => 'SnippetController@getShow',
     'as' => 'snippet.getShow'));
+Route::get('snippets/{slug}/star', array('uses' => 'SnippetController@starSnippet',
+    'as' => 'snippet.star'));
+Route::get('snippets/{slug}/unstar', array('uses' => 'SnippetController@unstarSnippet',
+    'as' => 'snippet.unStar'));
 
 Route::get('tags/{slug}', array('uses' => 'TagController@getShow',
     'as' => 'tag.getShow'));
+
+// Password Resets
+Route::get('password/remind', array('as' => 'password.remind', 'uses' => 'RemindersController@getRemind'));
+Route::post('password/remind', array('as' => 'password.remind', 'uses' => 'RemindersController@postRemind'));
+Route::get('password/reset', array('as' => 'password.reset', 'uses' => 'RemindersController@getReset'));
+Route::post('password/reset/{token}', array('as' => 'password.reset', 'uses' => 'RemindersController@postReset'));
 
 // profile
 Route::get('profiles', array('uses' => 'UserController@getIndex',
@@ -47,8 +57,7 @@ Route::get('profiles/{slug}/snippets', array('uses' => 'UserController@getSnippe
     'as' => 'user.getSnippets'));
 
 // members
-Route::group(array('prefix' => 'members', 'before' => array('auth')), function()
-{
+Route::group(array('prefix' => 'members', 'before' => array('auth')), function () {
     Route::get('snippets/{slug}', array('uses' => 'Member\SnippetController@getShow',
         'as' => 'member.snippet.getShow'));
     Route::get('snippets/{slug}/edit', array('uses' => 'Member\SnippetController@getEdit',
@@ -61,7 +70,6 @@ Route::group(array('prefix' => 'members', 'before' => array('auth')), function()
     Route::post('submit/snippet', array('uses' => 'Member\SnippetController@postStore',
         'as' => 'member.snippet.postStore'));
 
-    Route::get('my-snippets', array('uses' => 'Member\UserController@getMySnippets',
-        'as' => 'member.user.getMySnippets'));
+    Route::get('dashboard', array('uses' => 'Member\UserController@dashboard',
+        'as' => 'member.user.dashboard'));
 });
-

@@ -13,8 +13,6 @@
 
 $app = new Illuminate\Foundation\Application;
 
-$app->redirectIfTrailingSlash();
-
 /*
 |--------------------------------------------------------------------------
 | Detect The Application Environment
@@ -26,12 +24,15 @@ $app->redirectIfTrailingSlash();
 |
 */
 
-$env = $app->detectEnvironment(array(
+$env = $app->detectEnvironment(function()
+{
+    if (!empty($_SERVER["APPLICATION_ENVIRONMENT"]))
+    {
+        return $_SERVER["APPLICATION_ENVIRONMENT"];
+    }
 
-	'local' => array('JOHNs-MacBook-Pro.local'),
-    'production' => array('mayonvolcanosoftware.com'),
-
-));
+    return "production";
+});
 
 /*
 |--------------------------------------------------------------------------

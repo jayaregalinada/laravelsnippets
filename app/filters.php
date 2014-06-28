@@ -11,15 +11,21 @@
 |
 */
 
-App::before(function($request)
-{
-	//
+App::before(function ($request) {
+    if (App::environment() === 'production') {
+
+        $client = new Raven_Client(Config::get('app.sentryDsn'));
+
+        $error_handler = new Raven_ErrorHandler($client);
+
+        // Register error handler callbacks
+        set_error_handler(array($error_handler, 'handleError'));
+        set_exception_handler(array($error_handler, 'handleException'));
+    }
 });
 
-
-App::after(function($request, $response)
-{
-	//
+App::after(function ($request, $response) {
+    //
 });
 
 /*
@@ -33,26 +39,24 @@ App::after(function($request, $response)
 |
 */
 
-Route::filter('auth', function($route, $request, $message = '', $nextUrl = '')
-{
+Route::filter('auth', function ($route, $request, $message = '', $nextUrl = '') {
     if (Auth::guest()) {
         if ($message) {
             return Redirect::route('auth.getLogin', array('next' => $nextUrl))->with('message', $message);
         }
+
         return Redirect::route('auth.getLogin');
     }
 });
 
-Route::filter('admin', function($route, $request)
-{
+Route::filter('admin', function ($route, $request) {
     if ( ! Auth::user()->isAdmin()) {
         return App::abort(401, 'You are not authorized.');
     }
 });
 
-Route::filter('auth.basic', function()
-{
-	return Auth::basic();
+Route::filter('auth.basic', function () {
+    return Auth::basic();
 });
 
 /*
@@ -66,9 +70,8 @@ Route::filter('auth.basic', function()
 |
 */
 
-Route::filter('guest', function()
-{
-	if (Auth::check()) return Redirect::to('/');
+Route::filter('guest', function () {
+    if (Auth::check()) return Redirect::to('/');
 });
 
 /*
@@ -82,10 +85,8 @@ Route::filter('guest', function()
 |
 */
 
-Route::filter('csrf', function()
-{
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+Route::filter('csrf', function () {
+    if (Session::token() != Input::get('_token')) {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
 });

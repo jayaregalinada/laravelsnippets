@@ -2,9 +2,10 @@
 
 use LaraSnipp\Repo\Snippet\SnippetRepositoryInterface;
 use LaraSnipp\Repo\Tag\TagRepositoryInterface;
+use LaraSnipp\Repo\User\UserRepositoryInterface;
 
-class TagController extends BaseController {
-
+class TagController extends BaseController
+{
     /**
      * Tag repository
      *
@@ -19,10 +20,21 @@ class TagController extends BaseController {
      */
     protected $snippet;
 
-    public function __construct(TagRepositoryInterface $tag, SnippetRepositoryInterface $snippet)
+    /**
+     * User repository
+     *
+     * @var \LaraSnipp\Repo\Snippet\UserRepositoryInterface
+     */
+    protected $user;
+
+    public function __construct(
+        TagRepositoryInterface $tag,
+        SnippetRepositoryInterface $snippet,
+        UserRepositoryInterface $user)
     {
         $this->tag = $tag;
         $this->snippet = $snippet;
+        $this->user = $user;
     }
 
     /**
@@ -34,17 +46,21 @@ class TagController extends BaseController {
         $page = Input::get('page', 1);
 
         // Candidate for config item
-        $perPage = 10;
+        $perPage = 30;
 
         $pagiData = $this->snippet->byTag($slug, $page, $perPage);
 
-        if ( ! $pagiData->tag) {
+        if (! $pagiData->tag) {
             return App::abort(404);
         }
 
         $tag = $pagiData->tag;
         $snippets = Paginator::make($pagiData->items, $pagiData->totalItems, $perPage);
-        return View::make('tags.snippets', compact('snippets', 'tag'));
+
+        $tags = $this->tag->all();
+        $topSnippetContributors = $this->user->getTopSnippetContributors();
+
+        return View::make('tags.snippets', compact('snippets', 'tag', 'tags', 'topSnippetContributors'));
     }
 
 }
